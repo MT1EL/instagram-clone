@@ -17,7 +17,12 @@ import findPeopleFilled from "../assets/FindPeople-Fiil.png";
 import activity from "../assets/ActivityFeed.png";
 import activityFilled from "../assets/ActivityFeed-Fiil.png";
 import search from "../assets/Search.png";
-function Header() {
+import { auth } from "../firebase";
+import { useNavigate } from "react-router";
+import defaultUser from "../assets/defaultUserImage.jpg";
+function Header({ authenticated, setAuthenticated, onOpen }) {
+  const navigate = useNavigate();
+
   const icons = [home, messenger, newPost, findPeople, activity];
   const filledIcons = [
     homeFilled,
@@ -26,6 +31,7 @@ function Header() {
     findPeopleFilled,
     activityFilled,
   ];
+
   return (
     <Box
       borderBottom="1px solid #000"
@@ -51,10 +57,37 @@ function Header() {
             borderRadius="3px"
           />
         </InputGroup>
-        <Box display="flex" p="7px, 0px, 7px, 24px" gap="22px">
+        <Box
+          display="flex"
+          p="7px, 0px, 7px, 24px"
+          gap="22px"
+          alignItems="center"
+        >
           {icons.map((icon, index) => (
-            <Img src={icon} alt="icons" objectFit="contain" key={index} />
+            <Img
+              src={icon}
+              alt="icons"
+              objectFit="contain"
+              key={index}
+              onClick={index === 2 ? onOpen : null}
+            />
           ))}
+          <Img
+            src={authenticated.photoURL ? authenticated.photoURL : defaultUser}
+            alt="icons"
+            objectFit="contain"
+            h="25px"
+            borderRadius="50%"
+            onClick={() =>
+              auth
+                .signOut()
+                .then(async (res) => {
+                  localStorage.setItem("user", "false");
+                  setAuthenticated(false);
+                })
+                .catch((er) => console.log(er))
+            }
+          />
         </Box>
       </Box>
     </Box>
