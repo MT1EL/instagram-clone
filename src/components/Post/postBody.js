@@ -6,21 +6,48 @@ import likeFilled from "../../assets/likeFilled.png";
 import comment from "../../assets/Comment.png";
 import share from "../../assets/SharePosts.png";
 import save from "../../assets/Save.png";
-import { doc, updateDoc } from "firebase/firestore";
+import saveFilled from "../../assets/SaveFilled.png";
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { auth, db } from "../../firebase";
-function PostBody({ imageUrl, description, likes, comments, name, id }) {
+function PostBody({
+  createdAt,
+  imageUrl,
+  description,
+  likes,
+  comments,
+  name,
+  id,
+  saved,
+}) {
   const [oneCom, setOneCom] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [postUploadTime, setPostUploadTime] = useState(0);
   useEffect(() => {
     const result =
       comments.length > 0
         ? comments[Math.floor(Math.random() * comments.length)]
         : false;
     setOneCom(result);
+    setPostUploadTime(
+      Math.ceil(
+        (new Date().getTime() - new Date(createdAt.seconds * 1000).getTime()) /
+          one_hour
+      )
+    );
   }, []);
+  const one_day = 1000 * 60 * 60 * 24;
+  const one_hour = 1000 * 60 * 60;
+
   const currentUser = auth.currentUser.email;
   const postRef = doc(db, "posts", id);
-
+  const uid = auth.currentUser.uid;
+  const userRef = doc(db, "users", uid);
   const handleLike = () => {
     let newArr = [...likes];
     !likes.includes(currentUser)
@@ -30,10 +57,31 @@ function PostBody({ imageUrl, description, likes, comments, name, id }) {
       likes: newArr,
     });
   };
+  const handleSave = () => {
+    getDoc(postRef)
+      .then((res) => {
+        let newArr = [...saved];
+        newArr.includes(res.id)
+          ? newArr.splice(newArr.indexOf(res.id), 1)
+          : newArr.push(res.id);
+
+        updateDoc(userRef, {
+          saved: newArr,
+        });
+      })
+      .catch((e) => console.log(e));
+  };
+
   return (
-    <Box onDoubleClick={handleLike}>
+    <Box>
       {/* Post Image */}
-      <Img src={imageUrl} alt="image" w="100%" objectFit="cover" />
+      <Img
+        src={imageUrl}
+        alt="image"
+        w="100%"
+        objectFit="cover"
+        onDoubleClick={handleLike}
+      />
       {/* Post Footer Container */}
       <Box px="16px" border="1px solid #DBDBDB">
         {/* Post Icons */}
@@ -56,7 +104,22 @@ function PostBody({ imageUrl, description, likes, comments, name, id }) {
             <Img src={comment} alt="icon" p="8px" />
             <Img src={share} alt="icon" p="8px" />
           </Box>
-          <Img src={save} alt="icon" objectFit="contain" />
+          <Img
+            src={save}
+            alt="icon"
+            objectFit="contain"
+            onClick={handleSave}
+            cursor="pointer"
+            display={saved.includes(id) ? "none" : "block"}
+          />
+          <Img
+            src={saveFilled}
+            alt="save Filled"
+            objectFit={"contain"}
+            onClick={handleSave}
+            cursor="pointer"
+            display={saved.includes(id) ? "block" : "none"}
+          />
         </Box>
         {/* Post Likes */}
         <Box display="flex">
@@ -115,7 +178,18 @@ function PostBody({ imageUrl, description, likes, comments, name, id }) {
           </Text>
         </Box>
         <Box>
-          <Text color="#8E8E8E">1 Hour ago</Text>
+          <Text color="#8E8E8E">
+            {postUploadTime === 1
+              ? "less than "
+              : postUploadTime >= 24
+              ? postUploadTime / 24
+              : postUploadTime >= 168 && postUploadTime / 168}{" "}
+            {postUploadTime < 24
+              ? "Hour ago"
+              : postUploadTime >= 24
+              ? "Day ago"
+              : postUploadTime >= 168 && "Week ago"}
+          </Text>
         </Box>
       </Box>
     </Box>
