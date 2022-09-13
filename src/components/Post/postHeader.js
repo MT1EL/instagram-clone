@@ -1,9 +1,8 @@
 import React from "react";
 import { Box, Img, Text } from "@chakra-ui/react";
-import profilePic from "../../assets/profilePics/Profile-Pic-S.png";
 import more from "../../assets/More.png";
 
-function PostHeader({ name }) {
+function PostHeader({ name, image }) {
   return (
     <Box
       mt="30px"
@@ -14,7 +13,15 @@ function PostHeader({ name }) {
       border="1px solid #DBDBDB"
     >
       <Box display="flex">
-        <Img src={profilePic} alt="profilePic" objectFit="contain" />
+        <Img
+          src={image}
+          alt="profilePic"
+          objectFit="cover"
+          w="22px"
+          h="22px"
+          borderRadius="50%"
+          mt="11px"
+        />
         {/*here should be userName */}
         <Text fontWeight="600" color="#262626" p="10px 0px 10px 14px">
           {name}

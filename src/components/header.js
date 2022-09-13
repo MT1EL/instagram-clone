@@ -18,20 +18,9 @@ import activity from "../assets/ActivityFeed.png";
 import activityFilled from "../assets/ActivityFeed-Fiil.png";
 import search from "../assets/Search.png";
 import { auth } from "../firebase";
-import { useNavigate } from "react-router";
 import defaultUser from "../assets/defaultUserImage.jpg";
 function Header({ authenticated, setAuthenticated, onOpen }) {
-  const navigate = useNavigate();
-
-  const icons = [home, messenger, newPost, findPeople, activity];
-  const filledIcons = [
-    homeFilled,
-    messengerFilled,
-    newPost,
-    findPeopleFilled,
-    activityFilled,
-  ];
-
+  const path = window.location.pathname;
   return (
     <Box
       borderBottom="1px solid #000"
@@ -45,7 +34,12 @@ function Header({ authenticated, setAuthenticated, onOpen }) {
         justifyContent="space-between"
       >
         <Img src={logo} alt="logo" objectFit="contain" />
-        <InputGroup maxW="215px" h="28px" position="relative">
+        <InputGroup
+          maxW="215px"
+          h="28px"
+          position="relative"
+          display={["none", "block"]}
+        >
           <InputLeftElement
             children={<Img src={search} alt="search" />}
             h="28px"
@@ -63,15 +57,44 @@ function Header({ authenticated, setAuthenticated, onOpen }) {
           gap="22px"
           alignItems="center"
         >
-          {icons.map((icon, index) => (
-            <Img
-              src={icon}
-              alt="icons"
-              objectFit="contain"
-              key={index}
-              onClick={index === 2 ? onOpen : null}
-            />
-          ))}
+          <Img
+            src={home}
+            alt="icons"
+            objectFit="contain"
+            display={path === "/" ? "none" : "block"}
+          />
+          <Img
+            src={homeFilled}
+            alt="icons"
+            objectFit="contain"
+            display={path === "/" ? "block" : "none"}
+          />
+          <Img
+            src={messenger}
+            alt="icons"
+            objectFit="contain"
+            display={path === "/messenger" ? "none" : "block"}
+          />
+          <Img
+            src={messengerFilled}
+            alt="icons"
+            objectFit="contain"
+            display={path === "/messenger" ? "block" : "none"}
+          />
+          <Img src={newPost} alt="icons" objectFit="contain" onClick={onOpen} />
+          <Img
+            src={findPeople}
+            alt="icons"
+            objectFit="contain"
+            display={path === "/findPeople" ? "none" : "block"}
+          />
+          <Img
+            src={findPeopleFilled}
+            alt="icons"
+            objectFit="contain"
+            display={path === "/findPeople" ? "block" : "none"}
+          />
+
           <Img
             src={authenticated.photoURL ? authenticated.photoURL : defaultUser}
             alt="icons"

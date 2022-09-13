@@ -41,10 +41,13 @@ function Post() {
   const toMap = data?.slice().reverse();
 
   return (
-    <Box maxW="614px">
+    <Box maxW={["100%", "614px"]}>
       {toMap?.map((doc) => (
         <Box key={doc.data().image}>
-          <PostHeader name={doc.data().user?.displayName} />
+          <PostHeader
+            name={doc.data().user?.displayName}
+            image={doc.data().user.profileImage}
+          />
           <PostBody
             saved={user?.saved}
             id={doc.id}

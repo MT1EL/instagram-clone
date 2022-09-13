@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Box, Flex, Img, Text } from "@chakra-ui/react";
-import image from "../../assets/postImage.png";
 import like from "../../assets/Lİke.png";
 import likeFilled from "../../assets/likeFilled.png";
 import comment from "../../assets/Comment.png";
 import share from "../../assets/SharePosts.png";
 import save from "../../assets/Save.png";
 import saveFilled from "../../assets/SaveFilled.png";
-import {
-  doc,
-  getDoc,
-  serverTimestamp,
-  Timestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 function PostBody({
   createdAt,
@@ -34,15 +27,14 @@ function PostBody({
         ? comments[Math.floor(Math.random() * comments.length)]
         : false;
     setOneCom(result);
+    const one_hour = 1000 * 60 * 60;
     setPostUploadTime(
       Math.ceil(
-        (new Date().getTime() - new Date(createdAt.seconds * 1000).getTime()) /
+        (new Date().getTime() - new Date(createdAt?.seconds * 1000).getTime()) /
           one_hour
       )
     );
   }, []);
-  const one_day = 1000 * 60 * 60 * 24;
-  const one_hour = 1000 * 60 * 60;
 
   const currentUser = auth.currentUser.email;
   const postRef = doc(db, "posts", id);
@@ -50,7 +42,7 @@ function PostBody({
   const userRef = doc(db, "users", uid);
   const handleLike = () => {
     let newArr = [...likes];
-    !likes.includes(currentUser)
+    !likes?.includes(currentUser)
       ? newArr.push(currentUser)
       : newArr.pop(currentUser);
     updateDoc(postRef, {
@@ -61,7 +53,7 @@ function PostBody({
     getDoc(postRef)
       .then((res) => {
         let newArr = [...saved];
-        newArr.includes(res.id)
+        newArr?.includes(res.id)
           ? newArr.splice(newArr.indexOf(res.id), 1)
           : newArr.push(res.id);
 
@@ -71,7 +63,6 @@ function PostBody({
       })
       .catch((e) => console.log(e));
   };
-
   return (
     <Box>
       {/* Post Image */}
@@ -92,14 +83,14 @@ function PostBody({
               alt="icon"
               p="8px"
               onClick={handleLike}
-              display={likes.includes(currentUser) ? "none" : "block"}
+              display={likes?.includes(currentUser) ? "none" : "block"}
             />
             <Img
               src={likeFilled}
               alt="icon"
               p="8px"
               onClick={handleLike}
-              display={likes.includes(currentUser) ? "block" : "none"}
+              display={likes?.includes(currentUser) ? "block" : "none"}
             />
             <Img src={comment} alt="icon" p="8px" />
             <Img src={share} alt="icon" p="8px" />
@@ -110,7 +101,7 @@ function PostBody({
             objectFit="contain"
             onClick={handleSave}
             cursor="pointer"
-            display={saved.includes(id) ? "none" : "block"}
+            display={saved?.includes(id) ? "none" : "block"}
           />
           <Img
             src={saveFilled}
@@ -118,7 +109,7 @@ function PostBody({
             objectFit={"contain"}
             onClick={handleSave}
             cursor="pointer"
-            display={saved.includes(id) ? "block" : "none"}
+            display={saved?.includes(id) ? "block" : "none"}
           />
         </Box>
         {/* Post Likes */}
@@ -142,7 +133,7 @@ function PostBody({
             overflow="hidden"
             noOfLines={1}
             isTruncated
-            display={!description && "none"}
+            display={description === false && "none"}
           >
             {/* Imperdiet in sit rhoncus, eleifend tellus augue lectus potenti
             pellentesque */}
@@ -152,7 +143,9 @@ function PostBody({
             position="absolute"
             right="2"
             color="#8E8E8E"
-            display={!description || (name.length < 400 && "none")}
+            display={
+              description === false || name.length < 400 ? "none" : "block"
+            }
           >
             more
           </Text>
@@ -182,7 +175,7 @@ function PostBody({
             {postUploadTime === 1
               ? "less than "
               : postUploadTime >= 24
-              ? postUploadTime / 24
+              ? Math.floor(postUploadTime / 24)
               : postUploadTime >= 168 && postUploadTime / 168}{" "}
             {postUploadTime < 24
               ? "Hour ago"

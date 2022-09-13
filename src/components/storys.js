@@ -26,8 +26,7 @@ function Storys() {
     <Box
       p="17px 0px"
       border="1px solid #DBDBDB"
-      //   mx="auto"
-      maxW="614px"
+      maxW={["100%", "614px"]}
       mt="30px"
     >
       <Box
